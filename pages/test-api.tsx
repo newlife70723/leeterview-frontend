@@ -5,12 +5,12 @@ export default function TestAPI() {
 
   const fetchData = async () => {
     try {
-        const res = await fetch("http://localhost:5281/weatherforecast");
-        const result = await res.json();
-        setData(JSON.stringify(result, null, 2));
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/weatherforecast`);
+      const result = await res.json();
+      setData(JSON.stringify(result, null, 2));
     } catch (error) {
-        console.error("API Error:", error);
-        setData("Error fetching data");
+      console.error("API Error:", error);
+      setData("Error fetching data");
     }
   };
 
