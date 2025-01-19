@@ -5,7 +5,7 @@ export default function TestAPI() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/weatherforecast`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/weatherforecast`);
       const result = await res.json();
       setData(JSON.stringify(result, null, 2));
     } catch (error) {
