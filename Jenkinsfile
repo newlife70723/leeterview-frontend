@@ -29,7 +29,7 @@ pipeline {
                         echo "Found Jira Issue: ${issueId}"
 
                         // 使用 withCredentials 引用 Jenkins 中配置的凭证
-                        withCredentials([usernamePassword(credentialsId: 'jira-api-credentials', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
+                        withCredentials([usernamePassword(credentialsId: 'ee7456d4-e6d3-43de-bbf2-9f54a35dcf76', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
                             // 获取该任务的所有 transitions
                             def transitionsResponse = sh(script: """
                                 curl -u ${JIRA_USER}:${JIRA_API_TOKEN} \
