@@ -1,1 +1,116 @@
 test github webhook and jenkins
+
+
+pipeline {
+    agent any
+
+    environment {
+        JIRA_URL = 'https://newlife70723.atlassian.net/rest/api/3/project'
+    }
+
+    stages {
+        stage('Check Jira Projects') {
+            steps {
+                script {
+                    // 使用 withCredentials 指令來引用 Jenkins 中設置的憑證
+                    withCredentials([usernamePassword(credentialsId: 'ee7456d4-e6d3-43de-bbf2-9f54a35dcf76', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
+                        // 發送 GET 請求到 Jira API，獲取專案資訊
+                        def response = sh(script: """
+                            curl -u ${JIRA_USER}:${JIRA_API_TOKEN} \
+                                -X GET \
+                                -H "Content-Type: application/json" \
+                                ${JIRA_URL}
+                        """, returnStdout: true).trim()
+
+                        // 顯示返回結果
+                        echo "Jira Projects: ${response}"
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Jira API request successful!'
+        }
+        failure {
+            echo 'Jira API request failed.'
+        }
+    }
+}
+
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Get Commit Message and Update Jira') {
+            steps {
+                script {
+                    // 获取最新的 Git 提交信息
+                    def commitMsg = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
+                    echo "Commit message: ${commitMsg}"
+
+                    // 从提交信息中提取 Jira 任务号 (例如：LEET-35)
+                    def jiraIssue = commitMsg =~ /LEET-\d+/
+                    if (jiraIssue) {
+                        def issueId = jiraIssue[0]
+                        echo "Found Jira Issue: ${issueId}"
+
+                        // 使用 withCredentials 引用 Jenkins 中配置的凭证
+                        withCredentials([usernamePassword(credentialsId: 'jira-api-credentials', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
+                            // 获取该任务的所有 transitions
+                            def transitionsResponse = sh(script: """
+                                curl -u ${JIRA_USER}:${JIRA_API_TOKEN} \
+                                    -X GET \
+                                    -H "Content-Type: application/json" \
+                                    https://newlife70723.atlassian.net/rest/api/3/issue/${issueId}/transitions
+                            """, returnStdout: true).trim()
+
+                            echo "Transitions Response: ${transitionsResponse}"
+
+                            // 提取 transition ID (例如：找到 "完成" 的 transition ID)
+                            def transitionId = sh(script: """
+                                echo '${transitionsResponse}' | jq -r '.transitions[] | select(.name=="完成") | .id'
+                            """, returnStdout: true).trim()
+
+                            echo "Transition ID for 'Completed': ${transitionId}"
+
+                            // 使用 transition ID 更新任务状态
+                            if (transitionId) {
+                                def updateResponse = sh(script: """
+                                    curl -u ${JIRA_USER}:${JIRA_API_TOKEN} \
+                                        -X POST \
+                                        -H "Content-Type: application/json" \
+                                        -d '{
+                                            "transition": {
+                                                "id": "${transitionId}"
+                                            }
+                                        }' \
+                                        https://newlife70723.atlassian.net/rest/api/3/issue/${issueId}/transitions
+                                """, returnStdout: true).trim()
+
+                                echo "Update Response: ${updateResponse}"
+                            } else {
+                                echo "Transition ID for 'Completed' not found."
+                            }
+                        }
+                    } else {
+                        echo "No Jira issue found in commit message."
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Jira task status updated successfully!'
+        }
+        failure {
+            echo 'Failed to update Jira task status.'
+        }
+    }
+}
+
