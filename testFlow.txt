@@ -1,54 +1,24 @@
-test github webhook and jenkins
-
-
 pipeline {
-    agent any
+    agent any  // 在任何可用的 Jenkins 節點上運行
 
     environment {
-        JIRA_URL = 'https://newlife70723.atlassian.net/rest/api/3/project'
+        COMPOSE_PROJECT_NAME = 'leeterview'
+        GIT_REPO_URL = 'https://github.com/newlife70723/leeterview-frontend.git'
+        GIT_BRANCH = 'main'
     }
 
     stages {
-        stage('Check Jira Projects') {
+        stage('Checkout') {
             steps {
-                script {
-                    // 使用 withCredentials 指令來引用 Jenkins 中設置的憑證
-                    withCredentials([usernamePassword(credentialsId: 'ee7456d4-e6d3-43de-bbf2-9f54a35dcf76', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
-                        // 發送 GET 請求到 Jira API，獲取專案資訊
-                        def response = sh(script: """
-                            curl -u ${JIRA_USER}:${JIRA_API_TOKEN} \
-                                -X GET \
-                                -H "Content-Type: application/json" \
-                                ${JIRA_URL}
-                        """, returnStdout: true).trim()
-
-                        // 顯示返回結果
-                        echo "Jira Projects: ${response}"
-                    }
-                }
+                // 檢出代碼
+                git branch: "${GIT_BRANCH}", url: "${GIT_REPO_URL}"
             }
         }
-    }
 
-    post {
-        success {
-            echo 'Jira API request successful!'
-        }
-        failure {
-            echo 'Jira API request failed.'
-        }
-    }
-}
-123
-
-pipeline {
-    agent any
-
-    stages {
-        stage('Get Commit Message and Update Jira') {
+        stage('Show Commit Info and Update Jira') {
             steps {
                 script {
-                    // 获取最新的 Git 提交信息
+                    // 顯示最新的 commit 訊息
                     def commitMsg = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
                     echo "Commit message: ${commitMsg}"
 
@@ -59,7 +29,7 @@ pipeline {
                         echo "Found Jira Issue: ${issueId}"
 
                         // 使用 withCredentials 引用 Jenkins 中配置的凭证
-                        withCredentials([usernamePassword(credentialsId: 'jira-api-credentials', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
+                        withCredentials([usernamePassword(credentialsId: 'ee7456d4-e6d3-43de-bbf2-9f54a35dcf76', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
                             // 获取该任务的所有 transitions
                             def transitionsResponse = sh(script: """
                                 curl -u ${JIRA_USER}:${JIRA_API_TOKEN} \
@@ -106,11 +76,10 @@ pipeline {
 
     post {
         success {
-            echo 'Jira task status updated successfully!'
+            echo 'Jira task status updated successfully and pipeline executed!'
         }
         failure {
-            echo 'Failed to update Jira task status.'
+            echo 'Failed to update Jira task status or pipeline execution failed.'
         }
     }
 }
-

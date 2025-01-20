@@ -1,24 +1,41 @@
 pipeline {
-    agent any  // 在任何可用的 Jenkins 節點上運行
-
-    environment {
-        COMPOSE_PROJECT_NAME = 'leeterview'
-        GIT_REPO_URL = 'https://github.com/newlife70723/leeterview-frontend.git'
-        GIT_BRANCH = 'main'
-    }
+    agent any  // 在任何可用的 Jenkins 节点上运行
 
     stages {
         stage('Checkout') {
             steps {
-                // 檢出代碼
-                git branch: "${GIT_BRANCH}", url: "${GIT_REPO_URL}"
+                // 检出代码
+                git branch: 'main', url: 'https://github.com/newlife70723/leeterview-frontend.git'
             }
         }
 
-        stage('Show Commit Info and Update Jira') {
+        stage('Show Commit Info') {
             steps {
                 script {
-                    // 顯示最新的 commit 訊息
+                    // 获取最新的 Git 提交信息
+                    def commitMsg = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
+                    echo "Commit message: ${commitMsg}"
+                }
+            }
+        }
+
+        stage('Build with Docker Compose') {
+            steps {
+                script {
+                    // 确保进入正确的文件夹并执行 Docker Compose
+                    dir('/home/ubuntu/leeterview') {
+                        // 使用 docker-compose 指令启动服务，并在容器退出时中止
+                        echo 'Building Docker images with Docker Compose...'
+                        sh 'docker-compose -f docker-compose.yml up --build --abort-on-container-exit'
+                    }
+                }
+            }
+        }
+
+        stage('Update Jira Task') {
+            steps {
+                script {
+                    // 获取最新的 Git 提交信息
                     def commitMsg = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
                     echo "Commit message: ${commitMsg}"
 
@@ -29,7 +46,7 @@ pipeline {
                         echo "Found Jira Issue: ${issueId}"
 
                         // 使用 withCredentials 引用 Jenkins 中配置的凭证
-                        withCredentials([usernamePassword(credentialsId: 'ee7456d4-e6d3-43de-bbf2-9f54a35dcf76', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
+                        withCredentials([usernamePassword(credentialsId: 'jira-api-credentials', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_API_TOKEN')]) {
                             // 获取该任务的所有 transitions
                             def transitionsResponse = sh(script: """
                                 curl -u ${JIRA_USER}:${JIRA_API_TOKEN} \
@@ -76,10 +93,10 @@ pipeline {
 
     post {
         success {
-            echo 'Jira task status updated successfully and pipeline executed!'
+            echo 'Jira task status updated successfully and Docker build completed!'
         }
         failure {
-            echo 'Failed to update Jira task status or pipeline execution failed.'
+            echo 'Failed to update Jira task status or Docker build failed.'
         }
     }
 }
