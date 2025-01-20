@@ -1,38 +1,47 @@
 pipeline {
-    agent any  // 在任何可用的 Jenkins 节点上运行
+    agent any
+
+    environment {
+        COMPOSE_PROJECT_NAME = 'leeterview'  // 自定义项目名称
+    }
 
     stages {
-        stage('Checkout') {
-            steps {
-                // 检出代码
-                git branch: 'main', url: 'https://github.com/newlife70723/leeterview-frontend.git'
-            }
-        }
-
-        stage('Show Commit Info') {
+        stage('Check Docker and Docker Compose') {
             steps {
                 script {
-                    // 获取最新的 Git 提交信息
-                    def commitMsg = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
-                    echo "Commit message: ${commitMsg}"
+                    // 检查 Docker 是否安装
+                    sh 'which docker'
+                    sh 'docker -v'
+                    
+                    // 检查 Docker Compose 是否安装
+                    sh 'which docker-compose'
+                    sh 'docker-compose -v'
                 }
             }
         }
 
-        stage('Build with Docker Compose') {
+        stage('Check Directory Permissions') {
             steps {
                 script {
-                    // 确保进入正确的文件夹并执行 Docker Compose
+                    // 确认 Jenkins 是否能列出 leeterview 目录中的文件
+                    sh 'ls -la /home/ubuntu/leeterview'
+                }
+            }
+        }
+
+        stage('Build and Run with Docker Compose') {
+            steps {
+                script {
+                    // 确保进入正确的文件夹并执行 Docker Compose（后台启动）
                     dir('/home/ubuntu/leeterview') {
-                        // 使用 docker-compose 指令启动服务，并在容器退出时中止
-                        echo 'Building Docker images with Docker Compose...'
-                        sh 'docker-compose -f docker-compose.yml up --build --abort-on-container-exit'
+                        // 使用 docker-compose 指令启动服务，后台执行
+                        sh 'docker-compose up -d --build'
                     }
                 }
             }
         }
 
-        stage('Update Jira Task') {
+        stage('Show Commit Info and Update Jira') {
             steps {
                 script {
                     // 获取最新的 Git 提交信息
@@ -93,10 +102,10 @@ pipeline {
 
     post {
         success {
-            echo 'Jira task status updated successfully and Docker build completed!'
+            echo 'Pipeline executed successfully!'
         }
         failure {
-            echo 'Failed to update Jira task status or Docker build failed.'
+            echo 'Pipeline failed!'
         }
     }
 }
