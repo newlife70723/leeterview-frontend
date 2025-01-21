@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         COMPOSE_PROJECT_NAME = 'leeterview'  // 自定义项目名称
+        GIT_REPO = 'git@github.com:newlife70723/leeterview-frontend.git' // Git 協議存儲庫
+        BRANCH = 'main' // 分支名稱
     }
 
     stages {
@@ -23,13 +25,17 @@ pipeline {
         stage('Pull Latest Code') {
             steps {
                 script {
-                    dir('/home/ubuntu/leeterview') {
-                        withCredentials([usernamePassword(credentialsId: 'c2c01946-6ec9-4636-99c8-f958d7dafc0b', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                    // 確保進入正確的目錄
+                    dir('/home/ubuntu/leeterview/leeterview-frontend') {
+                        // 使用 SSH 憑證拉取代碼
+                        withCredentials([sshUserPrivateKey(credentialsId: 'git-ssh-credentials', keyFileVariable: 'SSH_KEY')]) {
                             sh '''
-                                git config credential.helper store
-                                echo "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com" > ~/.git-credentials
+                                eval $(ssh-agent -s)
+                                ssh-add ${SSH_KEY}
                                 git reset --hard
-                                git pull origin main
+                                git fetch origin ${BRANCH}
+                                git checkout ${BRANCH}
+                                git pull origin ${BRANCH}
                             '''
                         }
                     }
