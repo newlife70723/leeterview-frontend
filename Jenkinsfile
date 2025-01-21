@@ -6,16 +6,16 @@ pipeline {
     }
 
     stages {
-        stage('Check Docker and Docker Compose') {
+        stage('Clean Docker Environment') { // 新增清理阶段
             steps {
                 script {
-                    // 检查 Docker 是否安装
-                    sh 'which docker'
-                    sh 'docker -v'
-                    
-                    // 检查 Docker Compose 是否安装
-                    sh 'which docker-compose'
-                    sh 'docker-compose -v'
+                    dir('/home/ubuntu/leeterview') {
+                        // 停止並刪除當前運行的容器
+                        sh 'docker-compose down'
+
+                        // 清理未使用的鏡像、容器、網路和卷
+                        sh 'docker system prune -a --volumes -f'
+                    }
                 }
             }
         }
@@ -37,20 +37,6 @@ pipeline {
             }
         }
 
-
-        stage('Clean Docker Environment') { // 新增清理阶段
-            steps {
-                script {
-                    dir('/home/ubuntu/leeterview') {
-                        // 停止並刪除當前運行的容器
-                        sh 'docker-compose down'
-
-                        // 清理未使用的鏡像、容器、網路和卷
-                        sh 'docker system prune -a --volumes -f'
-                    }
-                }
-            }
-        }
 
         stage('Build and Run with Docker Compose') {
             steps {
