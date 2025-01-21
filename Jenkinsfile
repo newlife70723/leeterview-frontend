@@ -20,11 +20,28 @@ pipeline {
             }
         }
 
-        stage('Check Directory Permissions') {
+        stage('Pull Latest Code') { // 新增阶段
             steps {
                 script {
-                    // 确认 Jenkins 是否能列出 leeterview 目录中的文件
-                    sh 'ls -la /home/ubuntu/leeterview'
+                    dir('/home/ubuntu/leeterview') {
+                        // 从版本控制系统中拉取最新代码
+                        sh 'git reset --hard'    // 确保清除本地修改
+                        sh 'git pull origin main' // 拉取最新代码（假设分支是 main）
+                    }
+                }
+            }
+        }
+
+        stage('Clean Docker Environment') { // 新增清理阶段
+            steps {
+                script {
+                    dir('/home/ubuntu/leeterview') {
+                        // 停止並刪除當前運行的容器
+                        sh 'docker-compose down'
+
+                        // 清理未使用的鏡像、容器、網路和卷
+                        sh 'docker system prune -a --volumes -f'
+                    }
                 }
             }
         }
