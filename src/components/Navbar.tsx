@@ -1,7 +1,6 @@
 "use client"; // 這是必須的，告訴 Next.js 這是客戶端組件
 
 import React, { useState } from "react";
-import Link from "next/link";
 
 // 定義每個導航項目的結構
 interface NavItem {
