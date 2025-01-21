@@ -20,17 +20,23 @@ pipeline {
             }
         }
 
-        stage('Pull Latest Code') { // 新增阶段
+        stage('Pull Latest Code') {
             steps {
                 script {
                     dir('/home/ubuntu/leeterview') {
-                        // 从版本控制系统中拉取最新代码
-                        sh 'git reset --hard'    // 确保清除本地修改
-                        sh 'git pull origin main' // 拉取最新代码（假设分支是 main）
+                        withCredentials([usernamePassword(credentialsId: 'c2c01946-6ec9-4636-99c8-f958d7dafc0b', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                            sh '''
+                                git config credential.helper store
+                                echo "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com" > ~/.git-credentials
+                                git reset --hard
+                                git pull origin main
+                            '''
+                        }
                     }
                 }
             }
         }
+
 
         stage('Clean Docker Environment') { // 新增清理阶段
             steps {
