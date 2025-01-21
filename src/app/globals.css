@@ -1,21 +1,15 @@
+/* 引入 Tailwind 基本樣式 */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* 添加自定義樣式 */
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Arial, sans-serif;
+}
+
+@layer utilities {
+  .text-shadow-custom {
+    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); /* 自定義文字陰影 */
+  }
 }

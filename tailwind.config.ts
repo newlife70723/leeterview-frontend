@@ -1,3 +1,4 @@
+// tailwind.config.ts
 import type { Config } from "tailwindcss";
 
 export default {
@@ -8,9 +9,8 @@ export default {
   ],
   theme: {
     extend: {
-      colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+      textShadow: {
+        custom: '4px 4px 8px rgba(0, 0, 0, 0.5)',  // 自定義的文字陰影
       },
     },
   },
