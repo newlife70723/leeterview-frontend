@@ -7,10 +7,10 @@ export default function ClientTopBarWrapper() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userAvatar, setUserAvatar] = useState("/customer.webp");
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-    setUserAvatar("/path/to/your/avatar.png");
-  };
+  // const handleLogin = () => {
+  //   setIsLoggedIn(true);
+  //   setUserAvatar("/path/to/your/avatar.png");
+  // };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
