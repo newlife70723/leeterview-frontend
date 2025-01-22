@@ -1,89 +1,107 @@
-"use client"; // 這是必須的，告訴 Next.js 這是客戶端組件
+"use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
+import { useMedia } from "use-media";
 
-// 定義每個導航項目的結構
+// 定義導航項目的結構
 interface NavItem {
   name: string;
   link?: string;
+  action?: string;
   subcategories?: NavItem[];
 }
 
 interface NavbarProps {
   items: NavItem[];
-  title?: string;  // 可選的標題屬性
+  onAction?: (actionName: string) => void; // 父組件傳入的回調函數，用於處理事件
 }
 
-const Navbar: React.FC<NavbarProps> = ({ items, title }) => {
-  const [openItem, setOpenItem] = useState<string | null>(null);
-
-  // 切換子菜單的顯示
-  const toggleSubmenu = (itemName: string) => {
-    if (openItem === itemName) {
-      setOpenItem(null); // 關閉子菜單
-    } else {
-      setOpenItem(itemName); // 展開子菜單
-    }
-  };
-
-  // 處理點擊事件：有子菜單則展開，沒有則顯示 No
-  const handleItemClick = (item: NavItem) => {
-    if (item.subcategories && item.subcategories.length > 0) {
-      toggleSubmenu(item.name); // 展開或收起子菜單
-    } else if (item.link) {
-      // 如果沒有子菜單，且有鏈接，則跳轉到該頁面
-      window.location.href = item.link;
-    } else {
-      alert("No link available"); // 沒有鏈接，顯示警告
-    }
-  };
-
-  // 渲染導航項目
-  const renderNavItems = (items: NavItem[]) => {
-    return (
-      <ul className="space-y-4">
-        {items.map((item, index) => (
-          <li key={index} className="relative">
-            <div
-              className="flex items-center cursor-pointer"
-              onClick={() => handleItemClick(item)} // 點擊時觸發處理函數
-            >
-              <span className="text-lg hover:text-blue-400">{item.name}</span>
-            </div>
-
-            {/* 根據 openItem 展開或收起子菜單 */}
-            {item.subcategories && openItem === item.name && (
+const Navbar: React.FC<NavbarProps> = ({ items, onAction }) => {
+    const [openItem, setOpenItem] = useState<string | null>(null); // 當前展開的菜單
+    const [menuOpen, setMenuOpen] = useState(false); // 手機版漢堡菜單狀態
+    const isMobile = useMedia({ maxWidth: 767 });
+  
+    const toggleSubmenu = (itemName: string) => {
+      setOpenItem(openItem === itemName ? null : itemName);
+    };
+  
+    const handleItemClick = (item: NavItem, event: React.MouseEvent) => {
+      event.stopPropagation();
+  
+      if (item.subcategories && item.subcategories.length > 0) {
+        toggleSubmenu(item.name);
+      } else if (item.action && onAction) {
+        onAction(item.action);
+      } else if (item.link) {
+        // 跳轉並收起菜單（手機版）
+        window.location.href = item.link;
+        setMenuOpen(false);
+      }
+    };
+  
+    const renderNavItems = (items: NavItem[]) => {
+      return (
+        <ul className="space-y-4">
+          {items.map((item, index) => (
+            <li key={index} className="relative">
               <div
-                className="bg-gray-800 text-white rounded-lg shadow-md w-full p-4 mt-2 overflow-hidden"
-                style={{
-                  opacity: openItem === item.name ? 1 : 0, // 控制透明度
-                }}
+                className="flex items-center cursor-pointer hover:text-blue-400"
+                onClick={(event) => handleItemClick(item, event)}
               >
-                <ul className="space-y-4">
+                {item.link ? (
+                  <Link href={item.link}>
+                    <span className="text-lg">{item.name}</span>
+                  </Link>
+                ) : (
+                  <span className="text-lg">{item.name}</span>
+                )}
+              </div>
+  
+              {item.subcategories && openItem === item.name && (
+                <ul className="bg-gray-700 text-white rounded-lg shadow-md w-full p-4 mt-2 space-y-2">
                   {item.subcategories.map((subItem, subIndex) => (
                     <li key={subIndex}>
-                      <span className="text-lg">{subItem.name}</span>
+                      <Link
+                        href={subItem.link || "#"}
+                        className="hover:text-blue-400"
+                        onClick={(event) => event.stopPropagation()}
+                      >
+                        {subItem.name}
+                      </Link>
                     </li>
                   ))}
                 </ul>
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      );
+    };
+  
+    return (
+      <nav className="bg-gray-800 text-white p-4 rounded-lg">
+        {isMobile ? (
+          <>
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold">Menu</h2>
+              <button
+                className="text-white focus:outline-none"
+                onClick={() => setMenuOpen(!menuOpen)}
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+              </button>
+            </div>
+            {menuOpen && <div className="mt-4">{renderNavItems(items)}</div>}
+          </>
+        ) : (
+          <div>{renderNavItems(items)}</div>
+        )}
+      </nav>
     );
   };
-
-  return (
-    <nav
-      className="bg-gray-800 text-white p-6 rounded-lg transition-all duration-300 ease-in-out"
-    >
-      {/* 根據 title 屬性條件渲染標題 */}
-      {title && <h2 className="text-2xl font-bold mb-6">{title}</h2>}
-      {renderNavItems(items)}
-    </nav>
-  );
-};
-
-export default Navbar;
-
+  
+  export default Navbar;
+  
