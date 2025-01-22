@@ -9,18 +9,16 @@ interface AvatarProps {
 const Avatar: React.FC<AvatarProps> = ({ avatarUrl, linkToProfile = true }) => {
   const avatar = (
     <Image
-      src={avatarUrl || "/images/customer.webp"}
+      src={avatarUrl || "/customer.webp"}
       alt="User Avatar"
       width={96}
-      height={96} 
+      height={96}
       className="rounded-full object-cover border border-gray-300"
     />
   );
 
   return linkToProfile ? (
-    <Link href="/profile">
-      <a className="cursor-pointer">{avatar}</a>
-    </Link>
+    <Link href="/profile">{avatar}</Link> // 移除內部的 <a>
   ) : (
     avatar
   );

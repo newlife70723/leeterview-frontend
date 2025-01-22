@@ -7,13 +7,7 @@ import SearchPopup from "../components/SearchPopup";
 // 導航數據
 const navData = [
   {
-    name: "Home",
-    link: "/",
-    subcategories: [],
-  },
-  {
     name: "Categories",
-    link: "/categories",
     subcategories: [
       { name: "Array", link: "/categories/array" },
       { name: "String", link: "/categories/string" },
