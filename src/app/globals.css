@@ -8,9 +8,19 @@ body {
   font-family: Arial, sans-serif;
 }
 
+/* 隱藏滾動條，保留滾動功能 */
+.scrollbar-hide {
+  -ms-overflow-style: none; 
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 @layer utilities {
   .text-shadow-custom {
     text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); /* 自定義文字陰影 */
   }
-  
+
 }

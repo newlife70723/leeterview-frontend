@@ -5,7 +5,7 @@ import TopBar from "./TopBar";
 
 export default function ClientTopBarWrapper() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userAvatar, setUserAvatar] = useState("/customer.webp");
+  const [userAvatar, setUserAvatar] = useState("/images/customer.webp");
 
   // const handleLogin = () => {
   //   setIsLoggedIn(true);
@@ -14,7 +14,7 @@ export default function ClientTopBarWrapper() {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    setUserAvatar("/customer.webp");
+    setUserAvatar("/images/customer.webp");
   };
 
   return (
