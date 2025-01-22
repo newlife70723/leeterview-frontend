@@ -52,7 +52,7 @@ const ArticlePage: React.FC = () => {
               How to Use Arrays in JavaScript
             </h3>
             <p className="text-sm text-gray-600 mt-2">
-              A beginner's guide to arrays in JavaScript.
+              A beginners guide to arrays in JavaScript.
             </p>
           </li>
           <li className="p-4 border border-gray-200 rounded-lg shadow-sm">
