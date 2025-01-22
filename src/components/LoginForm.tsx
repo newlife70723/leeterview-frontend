@@ -3,15 +3,15 @@
 import React, { useState } from "react";
 
 interface AuthFormProps {
-  onLogin: (username: string, password: string) => void; // 登录逻辑
-  onRegister: (username: string, password: string, email: string) => void; // 注册逻辑
+  onLogin: (username: string, password: string) => void;
+  onRegister: (username: string, password: string, email: string) => void;
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({ onLogin, onRegister }) => {
-  const [isLoginMode, setIsLoginMode] = useState(true); // 控制登录/注册模式
+  const [isLoginMode, setIsLoginMode] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [email, setEmail] = useState(""); // 注册模式下的邮箱
+  const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -22,13 +22,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ onLogin, onRegister }) => {
       return;
     }
 
-    setError(null); // 清除错误
+    setError(null); 
 
     if (isLoginMode) {
-      // 登录逻辑
       onLogin(username, password);
     } else {
-      // 注册逻辑
       onRegister(username, password, email);
     }
   };

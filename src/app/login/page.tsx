@@ -9,6 +9,10 @@ const LoginPage = () => {
     console.log("Logging in with:", username, password);
   };
 
+  const handleRegister = (username: string, password: string, email: string) => {
+    console.log("Register in with:", username, password, email);
+  }
+
   return (
     <div className="flex flex-col items-center justify-begin min-h-screen bg-gray-100">
       {/* 圖標與標題區域 */}
@@ -26,7 +30,7 @@ const LoginPage = () => {
 
       {/* 登入表單區域 */}
       <div className="w-full max-w-sm rounded-lg p-6">
-        <LoginForm onLogin={handleLogin} />
+        <LoginForm onLogin={handleLogin} onRegister={handleRegister}/>
       </div>
     </div>
   );
