@@ -92,7 +92,7 @@ const Home = () => {
                 Mastering Dynamic Programming
               </h3>
               <p className="text-gray-600 mt-2">
-                A beginner's guide to understanding and solving dynamic
+                A beginner&apos;s guide to understanding and solving dynamic
                 programming problems.
               </p>
             </li>

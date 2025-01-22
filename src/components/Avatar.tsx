@@ -1,16 +1,19 @@
 import Link from "next/link";
+import Image from "next/image";
 
 interface AvatarProps {
-  avatarUrl?: string; // 頭像的 URL，如果沒有，顯示預設頭像
-  linkToProfile?: boolean; // 是否讓頭像可以點擊並跳轉到 /profile
+  avatarUrl?: string;
+  linkToProfile?: boolean;
 }
 
 const Avatar: React.FC<AvatarProps> = ({ avatarUrl, linkToProfile = true }) => {
   const avatar = (
-    <img
-      src={avatarUrl || "https://i.pravatar.cc/150?img=1"} // 預設頭像
+    <Image
+      src={avatarUrl || "/default-avatar.png"}
       alt="User Avatar"
-      className="w-24 h-24 rounded-full object-cover border border-gray-300"
+      width={96}
+      height={96} 
+      className="rounded-full object-cover border border-gray-300"
     />
   );
 
