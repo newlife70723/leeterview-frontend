@@ -9,7 +9,7 @@ interface AvatarProps {
 const Avatar: React.FC<AvatarProps> = ({ avatarUrl, linkToProfile = true }) => {
   const avatar = (
     <Image
-      src={avatarUrl || "/default-avatar.png"}
+      src={avatarUrl || "/images/customer.webp"}
       alt="User Avatar"
       width={96}
       height={96} 

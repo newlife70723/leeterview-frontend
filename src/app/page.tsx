@@ -89,12 +89,12 @@ const Home = () => {
       {/* 主要內容區域 */}
       <main className="flex flex-col md:flex-row p-6 gap-6">
         {/* 左側導航欄 */}
-        <aside className="md:w-1/4 bg-transparent p-0 rounded-lg shadow-none">
+        <aside className="md:w-1/6 bg-transparent p-0 rounded-lg shadow-none">
           <Navbar items={navData} onAction={handleNavAction} />
         </aside>
 
         {/* 右側熱門文章區域 */}
-        <section className="md:w-3/4 bg-white p-6 rounded-lg shadow-lg h-full">
+        <section className="md:w-5/6 bg-white p-6 rounded-lg shadow-lg h-full">
           <h2 className="text-4xl font-extrabold text-left text-gray-800 mb-6">
             Trending Posts
           </h2>

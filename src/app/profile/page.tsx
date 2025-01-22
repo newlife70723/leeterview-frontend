@@ -7,7 +7,7 @@ const ProfilePage = () => {
   const user = {
     name: "John Doe",
     email: "john.doe@example.com",
-    avatarUrl: "https://i.pravatar.cc/150?img=3",
+    avatarUrl: "/images/customer.webp",
   };
 
   return (
