@@ -1,10 +1,41 @@
 "use client";
-import React, { useState } from "react";
-
-const categories = ["All", "Array", "String", "DP", "Graph", "Test1"];
+import React, { useState, useEffect } from "react";
 
 const ArticlePage: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState("All");
+  const [categories, setCategories] = useState<string[]>([]);
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+
+  // load label
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${baseUrl}/articles/getCategories`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          const responseText = await response.text();
+          console.log(responseText); // 可以檢查 API 回傳的資料
+
+          const data = JSON.parse(responseText); // 解析 JSON 回應
+          // 確保從返回的資料中獲取正確的 Labels，這裡假設 `data.data.data` 是標籤的陣列
+          setCategories(data.data?.data || []); // 如果沒有標籤，則設為空陣列
+        } else {
+          console.error("Failed to fetch categories:", response.status);
+          setCategories([]); // 如果 API 請求失敗，設為空陣列
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        setCategories([]); // 出錯時設為空陣列
+      }
+    };
+
+    fetchData();
+  }, [baseUrl])
 
   return (
     <>
