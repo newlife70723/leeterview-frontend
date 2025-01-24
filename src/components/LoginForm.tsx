@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 
 interface AuthFormProps {
   onLogin: (username: string, password: string) => void;
   onRegister: (username: string, password: string, email: string) => void;
-  setIsLoginMode: () => void;
+  setIsLoginMode: Dispatch<SetStateAction<boolean>>;
   isLoginMode: boolean;
 }
 
