@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface AuthFormProps {
   onLogin: (username: string, password: string) => void;

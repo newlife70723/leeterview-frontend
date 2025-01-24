@@ -3,14 +3,13 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useAuth } from "../context/AuthContext"; 
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-interface TopBarProps {
-  isLoggedIn: boolean;
-  userAvatar: string;
-  onLogout: () => void;
-}
+const TopBar: React.FC = () => {
+    const { isLoggedIn } = useAuth();
 
-const TopBar: React.FC<TopBarProps> = ({ isLoggedIn, userAvatar, onLogout }) => {
   return (
     <div className="fixed top-0 left-0 w-full bg-gray-800 text-white h-16 shadow-md flex items-center px-4 z-50">
       {/* Logo 部分 */}
@@ -23,7 +22,7 @@ const TopBar: React.FC<TopBarProps> = ({ isLoggedIn, userAvatar, onLogout }) => 
       {/* 登錄區域 */}
       <div className="flex items-center space-x-4">
         {isLoggedIn ? (
-          <LoggedInSection userAvatar={userAvatar} onLogout={onLogout} />
+          <LoggedInSection />
         ) : (
           <Link href="/login">
             <button className="bg-blue-500 px-4 py-2 rounded-lg text-sm hover:bg-blue-600 cursor-pointer">
@@ -37,10 +36,13 @@ const TopBar: React.FC<TopBarProps> = ({ isLoggedIn, userAvatar, onLogout }) => 
 };
 
 // 已登錄狀態部分
-const LoggedInSection: React.FC<{ userAvatar: string; onLogout: () => void }> = ({
-  userAvatar,
-  onLogout,
-}) => {
+const LoggedInSection: React.FC = () => {
+    const { logout, userAvatar } = useAuth();
+
+    const handleLogout = () => {
+        logout();
+      };
+
   return (
     <>
       <Image
@@ -51,11 +53,12 @@ const LoggedInSection: React.FC<{ userAvatar: string; onLogout: () => void }> = 
         className="rounded-full"
       />
       <button
-        onClick={onLogout}
+        onClick={handleLogout}
         className="bg-red-500 px-4 py-2 rounded-lg text-sm hover:bg-red-600 cursor-pointer"
       >
         Logout
       </button>
+      
     </>
   );
 };

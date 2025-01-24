@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import ClientTopBarWrapper from "../components/ClientTopBarWrapper";
+import { AuthProvider } from "../context/AuthContext"; // 引入 AuthProvider
+import TopBar from "../components/TopBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,9 +33,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* 導航欄交由 Client Component 處理 */}
-        <ClientTopBarWrapper />
-        <div className="pt-16">{children}</div>
+        <AuthProvider> {/* 包裹應用以提供全局狀態 */}
+          {/* 導航欄交由 Client Component 處理 */}
+          <TopBar />
+          <div className="pt-16">{children}</div>
+        </AuthProvider>
+        
       </body>
     </html>
   );
