@@ -5,10 +5,11 @@ import React, { useState } from "react";
 interface AuthFormProps {
   onLogin: (username: string, password: string) => void;
   onRegister: (username: string, password: string, email: string) => void;
+  setIsLoginMode: () => void;
+  isLoginMode: boolean;
 }
 
-const AuthForm: React.FC<AuthFormProps> = ({ onLogin, onRegister }) => {
-  const [isLoginMode, setIsLoginMode] = useState(true);
+const AuthForm: React.FC<AuthFormProps> = ({ onLogin, onRegister, setIsLoginMode, isLoginMode }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");

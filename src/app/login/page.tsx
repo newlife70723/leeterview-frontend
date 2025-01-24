@@ -1,16 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import LoginForm from "@/components/LoginForm";
-import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from "../../context/AuthContext"; 
 
 const LoginPage = () => {
-  const { login } = useAuth();
+  const { login, register } = useAuth();
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const [isLoginMode, setIsLoginMode] = useState(true);
 
+  //login logic
   const handleLogin = async (username: string, password: string) => {
     const payload = {
       "username": username,
@@ -29,12 +30,12 @@ const LoginPage = () => {
       const responseText = await response.text();
       if (response.ok) {
         const data = JSON.parse(responseText);
-        login(data.token, "/images/customer.webp", data.message);
+        login(data.data.token, "/images/customer.webp", data.message);
         setTimeout(() => window.history.back(), 3000);
         
       } else {
         const error = JSON.parse(responseText);
-        toast.error(error.message);
+        login("", "/images/customer.webp", error.message);
       }
 
     } catch (error) {
@@ -42,13 +43,14 @@ const LoginPage = () => {
     }
   };
 
+  // register logic
   const handleRegister = async (username: string, password: string, email: string) => {
     const payload = {
       "username": username,
       "password": password,
       "email": email,
     };
-  
+
     try {
       const response = await fetch(`${baseUrl}/users/register`, {
         method: "POST",
@@ -57,20 +59,21 @@ const LoginPage = () => {
         },
         body: JSON.stringify(payload),
       });
-  
+
       const responseText = await response.text(); 
       if (response.ok) {
         const data = JSON.parse(responseText);
-        toast.success(data.message);
+        register(true, data.message);
+        setIsLoginMode(true);
       } else {
         const error = JSON.parse(responseText);
-        toast.error(error.message);
+        register(false, error.message);
       }
     } catch (error) {
       console.error("Error during registration:", error);
     }
   };
-  
+
 
   return (
     <>
@@ -93,6 +96,8 @@ const LoginPage = () => {
           <LoginForm 
           onLogin={handleLogin} 
           onRegister={handleRegister}
+          isLoginMode={isLoginMode}
+          setIsLoginMode={setIsLoginMode}
           />
         </div>
       </div>

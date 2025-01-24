@@ -9,7 +9,8 @@ interface AuthContextType {
   isLoggedIn: boolean;
   userAvatar: string;
   login: (token: string, avatar: string, message: string) => void;
-  logout: () => void; // 確保 logout 函數存在
+  logout: () => void;
+  register: (success: boolean, message: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,11 +37,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = (token: string, avatar: string, message: string) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("avatar", avatar);
-    setIsLoggedIn(true);
-    setUserAvatar(avatar);
-    toast.success(message);
+    if (token) {
+      localStorage.setItem("token", token);
+      localStorage.setItem("avatar", avatar);
+      setIsLoggedIn(true);
+      setUserAvatar(avatar);
+      toast.success(message);
+    } else {
+      toast.error(message);
+    }
+    
   };
 
   const logout = () => {
@@ -51,8 +57,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     toast.success("Logout success");
   };
 
+  const register = (success: boolean, message: string) => {
+    if (success) {
+      // 以後可添加邏輯
+      toast.success(message);
+    } else {
+      // 以後可添加邏輯
+      toast.error(message);
+    }
+  }
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, userAvatar, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, userAvatar, login, logout, register }}>
       <ToastContainer position="top-right" autoClose={3000} />
       {children}
     </AuthContext.Provider>
