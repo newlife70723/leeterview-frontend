@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import LoginForm from "@/components/LoginForm";
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from "../../context/AuthContext"; 
 
