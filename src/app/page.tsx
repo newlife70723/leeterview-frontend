@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import Navbar from "../components/Navbar";
-import SearchPopup from "../components/SearchPopup";
+import Navbar from "@/components/Navbar";
+import SearchPopup from "@/components/SearchPopup";
+import { useRouter } from "next/navigation"; 
+import { useAuth } from "@/context/AuthContext"
 
 // 導航數據
 const navData = [
@@ -50,7 +52,17 @@ const articles = [
 ];
 
 const Home = () => {
+  const { isLoggedIn } = useAuth();
+  const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false); // 控制搜索框顯示
+
+  const handleComposeBtn = () => {
+    if (isLoggedIn) {
+      router.push('/article/compose');
+    } else {
+      router.push('/login');
+    }
+  }
 
   // 處理導航操作
   const handleNavAction = (actionName: string) => {
@@ -82,9 +94,16 @@ const Home = () => {
       </header>
 
       {/* 主要內容區域 */}
-      <main className="flex flex-col md:flex-row p-6 gap-6">
+      <main className="flex flex-col md:flex-row p-6 gap-6">       
+
         {/* 左側導航欄 */}
-        <aside className="md:w-1/6 bg-transparent p-0 rounded-lg shadow-none">
+        <aside className="md:w-1/6 bg-transparent p-0 rounded-lg shadow-none flex flex-col space-y-4">
+          <button
+            className="w-full p-4 rounded-lg bg-gray-500 text-white uppercase text-xl font-extrabold"
+            onClick={handleComposeBtn}
+          >
+            Compose
+          </button>
           <Navbar items={navData} onAction={handleNavAction} />
         </aside>
 

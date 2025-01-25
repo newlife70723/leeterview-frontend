@@ -1,13 +1,13 @@
-"use client"; // 確保這是客戶端組件
+"use client";
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// 定義 AuthContext 的型別
 interface AuthContextType {
   isLoggedIn: boolean;
   userAvatar: string;
+  loading: boolean;
   login: (token: string, avatar: string, message: string) => void;
   logout: () => void;
   register: (success: boolean, message: string) => void;
@@ -26,14 +26,19 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userAvatar, setUserAvatar] = useState("/images/customer.webp");
+  const [loading, setLoading] = useState(true); // 初始化 loading 为 true
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const avatar = localStorage.getItem("avatar");
-    if (token) {
-      setIsLoggedIn(true);
-      setUserAvatar(avatar || "/images/customer.webp"); // 頭像如果有就顯示，沒有則使用預設
-    }
+
+    setTimeout(() => {
+      if (token) {
+        setIsLoggedIn(true);
+        setUserAvatar(avatar || "/images/customer.webp");
+      }
+      setLoading(false); 
+    }, 500); 
   }, []);
 
   const login = (token: string, avatar: string, message: string) => {
@@ -46,7 +51,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } else {
       toast.error(message);
     }
-    
   };
 
   const logout = () => {
@@ -59,16 +63,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const register = (success: boolean, message: string) => {
     if (success) {
-      // 以後可添加邏輯
       toast.success(message);
     } else {
-      // 以後可添加邏輯
       toast.error(message);
     }
-  }
+  };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, userAvatar, login, logout, register }}>
+    <AuthContext.Provider value={{ isLoggedIn, userAvatar, loading, login, logout, register }}>
       <ToastContainer position="top-right" autoClose={3000} />
       {children}
     </AuthContext.Provider>
