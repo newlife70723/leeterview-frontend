@@ -3,17 +3,17 @@
 import React, { useState, useEffect } from "react";
 import MarkdownEditor from "@/components/MarkdownEditor";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // 引入样式
+import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation"; // Next.js router 用于跳转
+import { useRouter } from "next/navigation";
 
 const ComposePage: React.FC = () => {
-    const { isLoggedIn, loading } = useAuth(); // 引入 `loading` 状态
-    const router = useRouter(); // 使用 Next.js 路由进行跳转
+    const { isLoggedIn, loading } = useAuth(); 
+    const router = useRouter(); 
     const [activeCategory, setActiveCategory] = useState<string>("");
     const [categories, setCategories] = useState<string[]>([]);
-    const [content, setContent] = useState<string>(""); // Markdown 内容
-    const [title, setTitle] = useState<string>(""); // 标题
+    const [content, setContent] = useState<string>("");
+    const [title, setTitle] = useState<string>(""); 
 
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -70,8 +70,7 @@ const ComposePage: React.FC = () => {
         console.log("Selected category:", activeCategory);
         toast.success("Article submitted successfully!");
     };
-
-    // **延迟渲染，等待 `loading` 完成**
+    
     if (loading) {
         return (
             <div className="min-h-screen flex justify-center items-center bg-gray-100">
@@ -81,7 +80,7 @@ const ComposePage: React.FC = () => {
     }
 
     if (!isLoggedIn) {
-        return null; // 防止在跳转前短暂渲染页面内容
+        return null; 
     }
 
     return (

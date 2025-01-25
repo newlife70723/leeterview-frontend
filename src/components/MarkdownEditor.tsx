@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Editor } from "@toast-ui/react-editor";
 import "@toast-ui/editor/dist/toastui-editor.css";
 
@@ -12,6 +12,13 @@ interface MarkdownEditorProps {
 const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ content, onChange }) => {
     const editorRef = useRef<Editor | null>(null);
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+    const [previewStyle, setPreviewStyle] = useState<"tab" | "vertical">("vertical");
+
+    useEffect(() => {
+      if (typeof window !== "undefined") {
+          setPreviewStyle(window.innerWidth < 768 ? "tab" : "vertical");
+      }
+  }, []);
 
     const handleEditorChange = () => {
         if (editorRef.current) {
@@ -74,7 +81,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ content, onChange }) =>
       <div className="editor-container">
           <Editor
               initialValue={content}
-              previewStyle={window.innerWidth < 768 ? "tab" : "vertical"}
+              previewStyle={previewStyle}
               height="400px"
               initialEditType="markdown"
               useCommandShortcut={true}
