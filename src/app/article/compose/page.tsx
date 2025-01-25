@@ -1,19 +1,22 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import MarkdownEditor from "@/components/MarkdownEditor";
+import dynamic from "next/dynamic"; // 動態加載
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
+// 動態加載 MarkdownEditor 並禁用 SSR
+const MarkdownEditor = dynamic(() => import("@/components/MarkdownEditor"), { ssr: false });
+
 const ComposePage: React.FC = () => {
-    const { isLoggedIn, loading } = useAuth(); 
-    const router = useRouter(); 
+    const { isLoggedIn, loading } = useAuth();
+    const router = useRouter();
     const [activeCategory, setActiveCategory] = useState<string>("");
     const [categories, setCategories] = useState<string[]>([]);
     const [content, setContent] = useState<string>("");
-    const [title, setTitle] = useState<string>(""); 
+    const [title, setTitle] = useState<string>("");
 
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -35,8 +38,7 @@ const ComposePage: React.FC = () => {
                 });
 
                 if (response.ok) {
-                    const responseText = await response.text();
-                    const data = JSON.parse(responseText);
+                    const data = await response.json();
                     setCategories(data.data?.data || []);
                 } else {
                     console.error("Failed to fetch categories:", response.status);
@@ -70,7 +72,7 @@ const ComposePage: React.FC = () => {
         console.log("Selected category:", activeCategory);
         toast.success("Article submitted successfully!");
     };
-    
+
     if (loading) {
         return (
             <div className="min-h-screen flex justify-center items-center bg-gray-100">
@@ -80,7 +82,7 @@ const ComposePage: React.FC = () => {
     }
 
     if (!isLoggedIn) {
-        return null; 
+        return null;
     }
 
     return (
@@ -88,7 +90,6 @@ const ComposePage: React.FC = () => {
             <div className="w-[90%] max-w-3xl bg-white p-6 rounded-lg shadow-md">
                 <h1 className="text-2xl font-bold mb-4">Write an Article</h1>
 
-                {/* 标题输入框 */}
                 <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
                     Title
                 </label>
@@ -101,11 +102,9 @@ const ComposePage: React.FC = () => {
                     className="w-full px-3 py-2 mb-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
 
-                {/* 类别选择 */}
                 <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
                     Select Algorithm Category
                 </label>
-
                 <select
                     id="category"
                     value={activeCategory}
@@ -115,7 +114,6 @@ const ComposePage: React.FC = () => {
                     <option value="" disabled>
                         Choose a category
                     </option>
-
                     {categories.map((category) => (
                         <option key={category} value={category}>
                             {category}
@@ -123,12 +121,10 @@ const ComposePage: React.FC = () => {
                     ))}
                 </select>
 
-                {/* Markdown 编辑器 */}
                 <div className="mt-4">
                     <MarkdownEditor content={content} onChange={setContent} />
                 </div>
 
-                {/* 提交按钮 */}
                 <button
                     onClick={handleSubmit}
                     className="mt-4 w-full px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600"
@@ -136,8 +132,6 @@ const ComposePage: React.FC = () => {
                     Submit Article
                 </button>
             </div>
-
-            {/* Toast 容器 */}
             <ToastContainer position="top-right" autoClose={3000} />
         </div>
     );
