@@ -80,10 +80,6 @@ const ComposePage: React.FC = () => {
             toast.error("Article submitted failed.");
             console.error("Article submitted failed: ", error);
         }
-
-
-
-        
     };
 
     if (loading) {
