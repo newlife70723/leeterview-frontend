@@ -7,7 +7,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
-// 動態加載 MarkdownEditor 並禁用 SSR
 const MarkdownEditor = dynamic(() => import("@/components/MarkdownEditor"), { ssr: false });
 
 const ComposePage: React.FC = () => {
@@ -39,7 +38,7 @@ const ComposePage: React.FC = () => {
 
                 if (response.ok) {
                     const data = await response.json();
-                    setCategories(data.data?.data || []);
+                    setCategories(data.data.categories ? data.data.categories : []);
                 } else {
                     console.error("Failed to fetch categories:", response.status);
                     setCategories([]);
@@ -53,24 +52,37 @@ const ComposePage: React.FC = () => {
         fetchData();
     }, [baseUrl]);
 
-    const handleSubmit = () => {
-        if (!title.trim()) {
-            toast.error("Title is required.");
-            return;
-        }
-        if (!activeCategory) {
-            toast.error("Please select a category.");
-            return;
-        }
-        if (content.trim().length < 20) {
-            toast.error("Content must be at least 20 characters long.");
-            return;
+    const handleSubmit = async () => {
+        const postData = {
+            "title": title,
+            "category": activeCategory,
+            "content": content
         }
 
-        console.log("Submitted title:", title);
-        console.log("Submitted content:", content);
-        console.log("Selected category:", activeCategory);
-        toast.success("Article submitted successfully!");
+        console.log(postData);
+
+        try {
+            const response = await fetch(`${baseUrl}/articles/createNewArticle`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                },
+                body: JSON.stringify(postData),
+            })
+
+            if (response.ok) {
+                toast.success("Article submitted successfully!");
+            } else {
+                toast.error("Article submitted failed.");
+            }
+        } catch (error) {
+            toast.error("Article submitted failed.");
+        }
+
+
+
+        
     };
 
     if (loading) {
