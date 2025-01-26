@@ -11,17 +11,16 @@ interface Article {
 }
 
 interface SearchPopupProps {
-    onClose: () => void; // 關閉搜索框的回調函數
+    onClose: () => void; 
 }
 
 const SearchPopup: React.FC<SearchPopupProps> = ({ onClose }) => {
-    const [searchQuery, setSearchQuery] = useState(""); // 搜索輸入狀態
-    const [results, setResults] = useState<Article[]>([]); // 搜索結果
-    const [loading, setLoading] = useState(false); // 加載狀態
-    const [error, setError] = useState<string | null>(null); // 錯誤訊息
+    const [searchQuery, setSearchQuery] = useState(""); 
+    const [results, setResults] = useState<Article[]>([]); 
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null); 
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-    // 搜索文章的函數
     const fetchSearchResults = async (query: string) => {
         if (!query.trim()) {
             setResults([]);
@@ -56,17 +55,14 @@ const SearchPopup: React.FC<SearchPopupProps> = ({ onClose }) => {
         }
     };
 
-    // 使用 debounce 限制搜索請求頻率
     const debouncedSearch = useCallback(
         debounce((query: string) => fetchSearchResults(query), 300),
-        []
+        [fetchSearchResults]
     );
 
-    // 當搜索輸入發生變化時觸發請求
     useEffect(() => {
         debouncedSearch(searchQuery);
 
-        // 清理 debounce
         return () => debouncedSearch.cancel();
     }, [searchQuery, debouncedSearch]);
 
