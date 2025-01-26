@@ -78,7 +78,7 @@ const ComposePage: React.FC = () => {
             }
         } catch (error) {
             toast.error("Article submitted failed.");
-            console.error("Article submitted failed:", error);
+            console.error("Article submitted failed: ", error);
         }
 
 
