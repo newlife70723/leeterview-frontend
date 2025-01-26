@@ -35,8 +35,8 @@ const ArticlePage: React.FC = () => {
                 });
 
                 if (response.ok) {
-                    const { data } = await response.json(); // 確保返回的數據格式正確
-                    setArticle(data.article); // 確保提取正確層次的數據
+                    const { data } = await response.json(); 
+                    setArticle(data.article);
                 } else {
                     const errorResponse = await response.json();
                     toast.error(errorResponse.message || "Article not found!");
@@ -51,7 +51,7 @@ const ArticlePage: React.FC = () => {
     }, [postId, baseUrl]);
 
     if (!article) {
-        return <p>Loading...</p>; // 如果文章數據為 null，顯示 Loading
+        return <p>Loading...</p>;
     }
 
     return (
