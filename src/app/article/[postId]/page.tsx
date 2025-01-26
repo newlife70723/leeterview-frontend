@@ -5,9 +5,18 @@ import { useParams } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+interface Article {
+    id: number;
+    title: string;
+    content: string;
+    category: string;
+    createdAt: string;
+    likes: number;
+}
+
 const ArticlePage: React.FC = () => {
     const { postId } = useParams(); 
-    const [article, setArticle] = useState<any | null>(null);
+    const [article, setArticle] = useState<Article | null>(null);
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
     useEffect(() => {
