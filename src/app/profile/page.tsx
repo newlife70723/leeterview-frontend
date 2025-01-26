@@ -156,7 +156,7 @@ const ProfilePage = () => {
     const handleSaveChanges = async () => {
         if (editedUser) {
             try {
-                const response = await fetch(`${baseUrl}/users/pdateUserProfile`, {
+                const response = await fetch(`${baseUrl}/users/updateUserProfile`, {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
