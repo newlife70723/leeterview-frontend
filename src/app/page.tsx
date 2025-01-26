@@ -39,7 +39,6 @@ const Home = () => {
     const router = useRouter();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [articles, setArticles] = useState<Article[]>([]);
-    const [loading, setLoading] = useState(false);
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
     // 點擊 Compose 按鈕邏輯
@@ -59,7 +58,6 @@ const Home = () => {
     // 獲取熱門文章
     useEffect(() => {
         const fetchArticles = async () => {
-            setLoading(true);
             try {
                 const queryParams = new URLSearchParams({
                     category: "",
@@ -89,8 +87,6 @@ const Home = () => {
             } catch (error) {
                 console.error("Error fetching articles:", error);
                 setArticles([]);
-            } finally {
-                setLoading(false);
             }
         };
         fetchArticles();
