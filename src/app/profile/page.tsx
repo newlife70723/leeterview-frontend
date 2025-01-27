@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Select, { SingleValue } from "react-select";
 import countries from "world-countries";
+import Image from "next/image";
 
 // 定義 Country 和 CountryOption 的型別
 interface Country {
@@ -54,40 +55,40 @@ const ProfilePage = () => {
         };
     };
 
-    const GetUserProfile = async (): Promise<UserProfile> => {
-        try {
-            const response = await fetch(`${baseUrl}/users/getUserProfile`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch user profile");
-            }
-
-            const { data } = await response.json();
-            const profile = data.profile;
-
-            return {
-                name: profile.name || "New User",
-                email: profile.email || "example@example.com",
-                avatarUrl: profile.avatarUrl || "/images/default-avatar.png",
-                totalPosts: profile.totalPosts || 0,
-                totalLikes: profile.totalLikes || 0,
-                bio: profile.bio || "This is your bio. Click edit to update.",
-                location: getCountryOptionByCode(profile.location || "UNKNOWN"),
-            };
-        } catch (error) {
-            console.error("Error fetching user profile:", error);
-            throw error;
-        }
-    };
-
     // 初始化時獲取用戶資料
     useEffect(() => {
+        const GetUserProfile = async (): Promise<UserProfile> => {
+            try {
+                const response = await fetch(`${baseUrl}/users/getUserProfile`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                });
+    
+                if (!response.ok) {
+                    throw new Error("Failed to fetch user profile");
+                }
+    
+                const { data } = await response.json();
+                const profile = data.profile;
+    
+                return {
+                    name: profile.name || "New User",
+                    email: profile.email || "example@example.com",
+                    avatarUrl: profile.avatarUrl || "/images/default-avatar.png",
+                    totalPosts: profile.totalPosts || 0,
+                    totalLikes: profile.totalLikes || 0,
+                    bio: profile.bio || "This is your bio. Click edit to update.",
+                    location: getCountryOptionByCode(profile.location || "UNKNOWN"),
+                };
+            } catch (error) {
+                console.error("Error fetching user profile:", error);
+                throw error;
+            }
+        };
+
         const fetchData = async () => {
             try {
                 const profile = await GetUserProfile();
@@ -200,11 +201,15 @@ const ProfilePage = () => {
             {/** 用戶頭像 */}
             <div className="relative">
                 <label htmlFor="avatar-upload">
-                    <img
+                <div className="flex justify-center items-center w-32 h-32 rounded-full overflow-hidden bg-gray-200">
+                    <Image
                         src={user.avatarUrl}
                         alt="User Avatar"
-                        className="w-32 h-32 rounded-full border-2 border-gray-300 shadow-md cursor-pointer"
+                        width={128}
+                        height={128}
+                        className="object-cover"
                     />
+                </div>
                 </label>
                 <input
                     id="avatar-upload"

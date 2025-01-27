@@ -76,9 +76,11 @@ const EditPostPage: React.FC = () => {
                     setContent(data.article.content);
                 } else {
                     const errorResponse = await response.json();
+                    toast.error(errorResponse.message || "Article not found!");
                 }
             } catch (error) {
                 console.error("Error fetching article:", error);
+                toast.error("Error loading the article.");
             }
         };
         fetchArticle();
