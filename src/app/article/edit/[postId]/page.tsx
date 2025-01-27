@@ -1,30 +1,31 @@
-"use client";
+"use client"
 
-import React, { useState, useEffect } from "react";
-import dynamic from "next/dynamic"; // 動態加載
+import React, { useEffect, useState } from "react"
+import dynamic from "next/dynamic";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
+import { useParams } from "../../../../../node_modules/next/navigation";
 
 const MarkdownEditor = dynamic(() => import("@/components/MarkdownEditor"), { ssr: false });
 
-const ComposePage: React.FC = () => {
-    const { isLoggedIn, loading } = useAuth();
-    const router = useRouter();
-    const [activeCategory, setActiveCategory] = useState<string>("");
+interface Article {
+    id: number;
+    title: string;
+    content: string;
+    category: string;
+    createdAt: string;
+    likes: number;
+}
+
+const EditPostPage: React.FC = () => {
+    const { postId } = useParams();
+    const [article, setArticle] = useState<Article | null>(null);
     const [categories, setCategories] = useState<string[]>([]);
     const [content, setContent] = useState<string>("");
     const [title, setTitle] = useState<string>("");
-
+    const [activeCategory, setActiveCategory] = useState<string>("");
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-
-    useEffect(() => {
-        if (!loading && !isLoggedIn) {
-            toast.error("Please log in to continue.");
-            router.push("/login");
-        }
-    }, [isLoggedIn, loading, router]);
+    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -52,16 +53,48 @@ const ComposePage: React.FC = () => {
         fetchData();
     }, [baseUrl]);
 
+    useEffect(() => {
+        if (!postId) {
+            console.error("Post ID is missing.");
+            return;
+        }
+
+        const fetchArticle = async () => {
+            try {
+                const response = await fetch(`${baseUrl}/articles/${postId}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+    
+                if (response.ok) {
+                    const { data } = await response.json(); 
+                    setArticle(data.article);
+                    setTitle(data.article.title);
+                    setActiveCategory(data.article.category);
+                    setContent(data.article.content);
+                } else {
+                    const errorResponse = await response.json();
+                }
+            } catch (error) {
+                console.error("Error fetching article:", error);
+            }
+        };
+        fetchArticle();
+    }, [postId, baseUrl]);
+
     const handleSubmit = async () => {
         const postData = {
+            "id": postId,
             "title": title,
             "category": activeCategory,
             "content": content
         }
 
         try {
-            const response = await fetch(`${baseUrl}/articles/createNewArticle`, {
-                method: "POST",
+            const response = await fetch(`${baseUrl}/articles/editPost`, {
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -80,32 +113,23 @@ const ComposePage: React.FC = () => {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="min-h-screen flex justify-center items-center bg-gray-100">
-                <p>Loading...</p>
-            </div>
-        );
-    }
-
-    if (!isLoggedIn) {
-        return null;
+    if (!article) {
+        return <p>Loading...</p>;
     }
 
     return (
         <div className="min-h-screen bg-gray-100 flex justify-center items-start py-10">
             <div className="w-[90%] max-w-3xl bg-white p-6 rounded-lg shadow-md">
-                <h1 className="text-2xl font-bold mb-4">Write an Article</h1>
+                <h1 className="text-2xl font-bold mb-4">Edit your Article</h1>
 
                 <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
                     Title
                 </label>
                 <input
-                    id="title"
+                    id="title" 
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Enter your article title..."
                     className="w-full px-3 py-2 mb-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
 
@@ -138,10 +162,10 @@ const ComposePage: React.FC = () => {
                 >
                     Submit Article
                 </button>
+                <ToastContainer position="top-right" autoClose={3000} />
             </div>
-            <ToastContainer position="top-right" autoClose={3000} />
         </div>
-    );
-};
+    )
+}
 
-export default ComposePage;
+export default EditPostPage;
