@@ -5,11 +5,13 @@ import Image from "next/image";
 import LoginForm from "@/components/LoginForm";
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from "../../context/AuthContext"; 
+import { useRouter } from "../../../node_modules/next/navigation";
 
 const LoginPage = () => {
   const { login, register } = useAuth();
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const [isLoginMode, setIsLoginMode] = useState(true);
+  const router = useRouter();
 
   //login logic
   const handleLogin = async (username: string, password: string) => {
@@ -30,12 +32,12 @@ const LoginPage = () => {
       const responseText = await response.text();
       if (response.ok) {
         const data = JSON.parse(responseText);
-        login(data.data.token, "/images/customer.webp", data.message);
-        setTimeout(() => window.history.back(), 3000);
+        login(data.data.token, "/images/customer.webp", data.message, data.data.userId);
+        router.back();
         
       } else {
         const error = JSON.parse(responseText);
-        login("", "/images/customer.webp", error.message);
+        login("", "/images/customer.webp", error.message, "");
       }
 
     } catch (error) {

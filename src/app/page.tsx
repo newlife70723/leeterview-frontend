@@ -6,25 +6,6 @@ import SearchPopup from "@/components/SearchPopup";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
-// 導航數據
-const navData = [
-    {
-        name: "Article",
-        link: "/article",
-        subcategories: [],
-    },
-    {
-        name: "Search",
-        action: "openSearch",
-        subcategories: [],
-    },
-    {
-        name: "Profile",
-        link: "/profile",
-        subcategories: [],
-    },
-];
-
 interface Article {
     id: number;
     title: string;
@@ -35,11 +16,34 @@ interface Article {
 }
 
 const Home = () => {
-    const { isLoggedIn } = useAuth();
     const router = useRouter();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [articles, setArticles] = useState<Article[]>([]);
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+    const { isLoggedIn } = useAuth();
+
+    const navData = [
+        {
+            name: "Article",
+            link: "/article",
+            subcategories: [],
+        },
+        {
+            name: "Search",
+            action: "openSearch",
+            subcategories: [],
+        },
+        {
+            name: "Profile",
+            link: isLoggedIn ? "/profile" : "/login",
+            subcategories: [],
+        },
+        {
+            name: "MyArticles",
+            link: "/myArticles",
+            subcategories: [],
+        }
+    ];
 
     // 點擊 Compose 按鈕邏輯
     const handleComposeBtn = () => {

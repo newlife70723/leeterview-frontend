@@ -70,7 +70,8 @@ const ComposePage: React.FC = () => {
             })
 
             if (response.ok) {
-                toast.success("Article submitted successfully!");
+                const { data } = await response.json();
+                router.push(`/article/${data.data.id}`);
             } else {
                 toast.error("Article submitted failed.");
             }

@@ -8,7 +8,7 @@ interface AuthContextType {
   isLoggedIn: boolean;
   userAvatar: string;
   loading: boolean;
-  login: (token: string, avatar: string, message: string) => void;
+  login: (token: string, avatar: string, message: string, userId: string) => void;
   logout: () => void;
   register: (success: boolean, message: string) => void;
 }
@@ -41,10 +41,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, 500); 
   }, []);
 
-  const login = (token: string, avatar: string, message: string) => {
+  const login = (token: string, avatar: string, message: string, userId: string) => {
     if (token) {
       localStorage.setItem("token", token);
       localStorage.setItem("avatar", avatar);
+      localStorage.setItem("userId", userId);
       setIsLoggedIn(true);
       setUserAvatar(avatar);
       toast.success(message);

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import debounce from "lodash.debounce";
+import { useRouter } from "../../node_modules/next/navigation";
 
 interface Article {
     id: string;
@@ -18,6 +19,11 @@ const SearchPopup: React.FC<SearchPopupProps> = ({ onClose }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+    const router = useRouter();
+
+    const handleClick = (id: string) => {
+        router.push(`/article/${id}`);
+    }
 
     const fetchSearchResults = useCallback(async (query: string) => {
         if (!query.trim()) {
@@ -41,6 +47,7 @@ const SearchPopup: React.FC<SearchPopupProps> = ({ onClose }) => {
 
             if (response.ok) {
                 const data = await response.json();
+                
                 setResults(data?.data?.articles || []);
             } else {
                 setError("Failed to fetch search results.");
@@ -51,18 +58,18 @@ const SearchPopup: React.FC<SearchPopupProps> = ({ onClose }) => {
         } finally {
             setLoading(false);
         }
-    }, [baseUrl]); // 確保 baseUrl 是穩定的
+    }, [baseUrl]); 
 
     const debouncedSearch = useCallback(
         debounce((query: string) => fetchSearchResults(query), 300),
-        [fetchSearchResults] // 僅在 fetchSearchResults 改變時更新
+        [fetchSearchResults] 
     );
 
     useEffect(() => {
         debouncedSearch(searchQuery);
 
         return () => {
-            debouncedSearch.cancel(); // 清理防抖處理
+            debouncedSearch.cancel(); 
         };
     }, [searchQuery, debouncedSearch]);
 
@@ -95,10 +102,12 @@ const SearchPopup: React.FC<SearchPopupProps> = ({ onClose }) => {
                     ) : results.length > 0 ? (
                         results.map((item) => (
                             <li key={item.id} className="mb-2">
-                                <a href={item.url} className="text-blue-500 hover:underline">
-                                    <h3>{item.title}</h3>
-                                </a>
-                                <p className="text-sm text-gray-600">{item.description}</p>
+                                <div 
+                                    onClick={() => handleClick(item.id)} 
+                                    className="text-blue-500 hover:underline cursor-pointer"
+                                >
+                                    <h3>{item.title}</h3> 
+                                </div>
                             </li>
                         ))
                     ) : (

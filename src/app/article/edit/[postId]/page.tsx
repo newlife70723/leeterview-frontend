@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react"
 import dynamic from "next/dynamic";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useParams } from "../../../../../node_modules/next/navigation";
+import { useParams, useRouter } from "../../../../../node_modules/next/navigation";
 
 const MarkdownEditor = dynamic(() => import("@/components/MarkdownEditor"), { ssr: false });
 
@@ -25,7 +25,7 @@ const EditPostPage: React.FC = () => {
     const [title, setTitle] = useState<string>("");
     const [activeCategory, setActiveCategory] = useState<string>("");
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-    
+    const router = useRouter();    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -106,6 +106,7 @@ const EditPostPage: React.FC = () => {
 
             if (response.ok) {
                 toast.success("Article submitted successfully!");
+                router.push(`/article/${postId}`);
             } else {
                 toast.error("Article submitted failed.");
             }

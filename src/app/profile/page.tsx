@@ -5,7 +5,6 @@ import Select, { SingleValue } from "react-select";
 import countries from "world-countries";
 import Image from "next/image";
 
-// 定義 Country 和 CountryOption 的型別
 interface Country {
     cca2: string;
     flag: string;
@@ -19,7 +18,6 @@ interface CountryOption {
     label: string;
 }
 
-// 定義用戶資料的型別
 interface UserProfile {
     name: string;
     email: string;
@@ -33,13 +31,11 @@ interface UserProfile {
 const ProfilePage = () => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-    // 將國家列表轉換成 react-select 可用的格式
     const countryOptions: CountryOption[] = countries.map((country: Country) => ({
         value: country.cca2,
         label: `${country.flag} ${country.name.common}`,
     }));
 
-    // 用戶狀態
     const [user, setUser] = useState<UserProfile | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [editedUser, setEditedUser] = useState<UserProfile | null>(null);
@@ -55,7 +51,6 @@ const ProfilePage = () => {
         };
     };
 
-    // 初始化時獲取用戶資料
     useEffect(() => {
         const GetUserProfile = async (): Promise<UserProfile> => {
             try {
@@ -102,7 +97,6 @@ const ProfilePage = () => {
         fetchData();
     }, []);
 
-    // 更新頭像
     const handleUpdateAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files?.[0]) {
             const file = event.target.files[0];
@@ -153,7 +147,6 @@ const ProfilePage = () => {
         }
     };
 
-    // 儲存編輯的資料
     const handleSaveChanges = async () => {
         if (editedUser) {
             try {
@@ -166,7 +159,7 @@ const ProfilePage = () => {
                     body: JSON.stringify({
                         email: editedUser.email,
                         bio: editedUser.bio,
-                        location: editedUser.location.value, // 傳遞 location 的 value
+                        location: editedUser.location.value,
                     }),
                 });
 
@@ -174,7 +167,6 @@ const ProfilePage = () => {
                     throw new Error("Failed to update user profile");
                 }
 
-                // 如果更新成功，將資料同步到本地狀態
                 setUser(editedUser);
                 setIsEditing(false);
                 alert("Profile updated successfully!");
@@ -191,7 +183,6 @@ const ProfilePage = () => {
         setIsEditing(false);
     };
 
-    // 資料尚未加載完成時顯示 Loading
     if (!user) {
         return <div>Loading...</div>;
     }
