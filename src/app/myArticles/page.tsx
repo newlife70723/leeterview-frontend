@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 interface Article {
     id: number;
@@ -14,9 +15,10 @@ interface Article {
 
 const MyArticlesPage: React.FC = () => {
     const [articles, setArticles] = useState<Article[]>([]);
-    const [loading, setLoading] = useState<boolean>(false); // Loading 狀態
+    const [loading, setLoading] = useState<boolean>(false);
     const router = useRouter();
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+    const { isLoggedIn } = useAuth();
 
     useEffect(() => {
         if (!baseUrl) {
@@ -24,7 +26,12 @@ const MyArticlesPage: React.FC = () => {
             return;
         }
 
-        const getPosts = async () => {
+        const getPosts = async (isLoggedIn: boolean) => {
+            if (!isLoggedIn) {
+                setArticles([]);
+                return;
+            }
+
             setLoading(true);
             const userId = localStorage.getItem("userId") ?? "";
 
@@ -56,8 +63,8 @@ const MyArticlesPage: React.FC = () => {
             }
         };
 
-        getPosts();
-    }, []);
+        getPosts(isLoggedIn);
+    }, [isLoggedIn]);
 
     return (
         <div className="min-h-screen bg-gray-100 flex justify-center items-start py-10">
